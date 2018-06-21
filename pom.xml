@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>rootparent</artifactId>
+        <groupId>com.blabla</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>sso-server</artifactId>
+    <packaging>jar</packaging>
+    <name>Spring Boot SSO Server</name>
+    <description>sso server </description>
+    
+	<properties>
+	   <docker.image.prefix>microservice</docker.image.prefix>
+	   <project.build.finalName>OAuth</project.build.finalName>
+	</properties>
+	
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-jwt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
+        </dependency>
+  		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+	      <groupId>org.springframework.cloud</groupId>
+	      <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+	    </dependency>
+	    <dependency>
+		    <groupId>com.blabla</groupId>  
+            <artifactId>common</artifactId>  
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+	<build>
+	    <plugins>
+	    	<!--plugin to make a executable springboot jar file -->
+	        <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>1.5.6.RELEASE</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!--to make a docker image -->
+	        <plugin>
+	            <groupId>com.spotify</groupId>
+	            <artifactId>dockerfile-maven-plugin</artifactId>
+	            <version>1.3.6</version>
+	            <configuration>
+	                <repository>${docker.image.prefix}/${project.artifactId}</repository>
+	                <buildArgs>
+	                    <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+	                </buildArgs>
+	            </configuration>
+	        </plugin>
+	        
+	        <!-- unpack jar -->
+	        <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+	    </plugins>
+	</build>
+</project>
